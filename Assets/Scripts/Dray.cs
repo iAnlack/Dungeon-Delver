@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Dray : MonoBehaviour
 {
-    public enum eMode { Idle, Move, Attack, Transition }
+    public enum EMode { Idle, Move, Attack, Transition }
 
     [Header("Set in Inspector")]
     public float Speed = 5;
@@ -14,7 +14,7 @@ public class Dray : MonoBehaviour
     [Header("Set Dynamically")]
     public int DirHeld = -1; // Направление, соответсвующее удерживаемой клавише
     public int Facing = 1;   // Направление движения Дрея
-    public eMode Mode = eMode.Idle;
+    public EMode Mode = EMode.Idle;
 
     private float _timeAttackDone = 0;
     private float _timeAttackNext = 0;
@@ -33,7 +33,7 @@ public class Dray : MonoBehaviour
 
     private void Update()
     {
-        //----Обработка ввода с клавиатуры и управление режимами eMode----
+        //----Обработка ввода с клавиатуры и управление режимами EMode----
         DirHeld = -1;
         for (int i = 0; i < 4; i++)
         {
@@ -46,7 +46,7 @@ public class Dray : MonoBehaviour
         // Нажата клавиша атаки
         if (Input.GetKeyDown(KeyCode.Z) && Time.time >= _timeAttackNext)
         {
-            Mode = eMode.Attack;
+            Mode = EMode.Attack;
             _timeAttackDone = Time.time + AttackDuration;
             _timeAttackNext = Time.time + AttackDelay;
         }
@@ -54,20 +54,20 @@ public class Dray : MonoBehaviour
         // Завершить атаку, если время истекло
         if (Time.time >= _timeAttackDone)
         {
-            Mode = eMode.Idle;
+            Mode = EMode.Idle;
         }
 
         // Выбрать правильный режим, если Дрей не атакует
-        if (Mode != eMode.Attack)
+        if (Mode != EMode.Attack)
         {
             if (DirHeld == -1)
             {
-                Mode = eMode.Idle;
+                Mode = EMode.Idle;
             }
             else
             {
                 Facing = DirHeld;
-                Mode = eMode.Move;
+                Mode = EMode.Move;
             }
         }
 
@@ -75,16 +75,16 @@ public class Dray : MonoBehaviour
         Vector3 vel = Vector3.zero;
         switch (Mode)
         {
-            case eMode.Idle:
+            case EMode.Idle:
                 _animator.CrossFade("Dray_Walk_" + Facing, 0);
                 _animator.speed = 0;
                 break;
-            case eMode.Move:
+            case EMode.Move:
                 vel = _directions[DirHeld];
                 _animator.CrossFade("Dray_Walk_" + Facing, 0);
                 _animator.speed = 1;
                 break;
-            case eMode.Attack:
+            case EMode.Attack:
                 _animator.CrossFade("Dray_Attack_" + Facing, 0);
                 _animator.speed = 0;
                 break;
