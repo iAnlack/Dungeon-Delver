@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Dray : MonoBehaviour
+public class Dray : MonoBehaviour, IFacingMover
 {
     public enum EMode { Idle, Move, Attack, Transition }
 
@@ -21,6 +21,7 @@ public class Dray : MonoBehaviour
 
     private Rigidbody _rigidbody;
     private Animator _animator;
+    private InRoom _inRoom;
 
     private Vector3[] _directions = new Vector3[] { Vector3.right, Vector3.up, Vector3.left, Vector3.down };
     private KeyCode[] _keys = new KeyCode[] { KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.LeftArrow, KeyCode.DownArrow };
@@ -29,6 +30,7 @@ public class Dray : MonoBehaviour
     {
         _rigidbody = GetComponent<Rigidbody>();
         _animator = GetComponent<Animator>();
+        _inRoom = GetComponent<InRoom>();
     }
 
     private void Update()
@@ -91,5 +93,61 @@ public class Dray : MonoBehaviour
         }
 
         _rigidbody.velocity = vel * Speed;
+    }
+
+    // Реализация интерфейса IFacingMover
+    public int GetFacing()
+    {
+        return Facing;
+    }
+
+    public bool Moving
+    {
+        get
+        {
+            return (Mode == EMode.Move);
+        }
+    }
+
+    public float GetSpeed()
+    {
+        return Speed;
+    }
+
+    public float GridMult
+    {
+        get
+        {
+            return _inRoom.GridMult;
+        }
+    }
+
+    public Vector2 RoomPos
+    {
+        get
+        {
+            return _inRoom.RoomPos;
+        }
+        set 
+        { 
+            _inRoom.RoomPos = value; 
+        }
+    }
+
+    public Vector2 RoomNum
+    {
+        get
+        {
+            return _inRoom.RoomNum;
+        }
+        set
+        {
+            _inRoom.RoomNum = value;
+        }
+    }
+
+    public Vector2 GetRoomPosOnGrid(float mult = -1)
+    {
+        return _inRoom.GetRoomPosOnGrid(mult);
     }
 }

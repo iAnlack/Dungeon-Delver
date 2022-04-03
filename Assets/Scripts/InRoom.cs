@@ -62,4 +62,20 @@ public class InRoom : MonoBehaviour
             transform.position = rm + rPos;
         }
     }
+
+    // Вычисляет координаты узла сетки, ближайшего к данному персонажу
+    public Vector2 GetRoomPosOnGrid(float mult = -1)
+	{
+        if (mult == -1)
+        {
+            mult = GridMult;
+        }
+
+        Vector2 rPos = RoomPos;
+        rPos /= mult;
+        rPos.x = Mathf.Round(rPos.x);
+        rPos.y = Mathf.Round(rPos.y);
+        rPos *= mult;
+        return rPos;
+    }
 }
