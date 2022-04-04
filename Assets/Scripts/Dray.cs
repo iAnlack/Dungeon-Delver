@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Dray : MonoBehaviour, IFacingMover
+public class Dray : MonoBehaviour, IFacingMover, IKeyMaster
 {
     public enum EMode { Idle, Move, Attack, Transition }
 
@@ -16,6 +16,7 @@ public class Dray : MonoBehaviour, IFacingMover
     public int DirHeld = -1; // Направление, соответсвующее удерживаемой клавише
     public int Facing = 1;   // Направление движения Дрея
     public EMode Mode = EMode.Idle;
+    public int NumKeys = 0;
 
     private float _timeAttackDone = 0;
     private float _timeAttackNext = 0;
@@ -219,5 +220,18 @@ public class Dray : MonoBehaviour, IFacingMover
     public Vector2 GetRoomPosOnGrid(float mult = -1)
     {
         return _inRoom.GetRoomPosOnGrid(mult);
+    }
+
+    // Реализация интерфейса IKeyMaster
+    public int KeyCount
+    {
+        get
+        {
+            return NumKeys;
+        }
+        set
+        {
+            NumKeys = value;
+        }
     }
 }

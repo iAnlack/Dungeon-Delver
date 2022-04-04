@@ -26,7 +26,11 @@ public class Tile : MonoBehaviour
         {
             eTileNum = TileCamera.GET_MAP(X, Y);
         }
-
+        else
+        {
+            TileCamera.SET_MAP(X, Y, eTileNum); // Заменить плитку, если необходимо
+        }
+        
         TileNum = eTileNum;
         GetComponent<SpriteRenderer>().sprite = TileCamera.SPRITES[TileNum];
 
