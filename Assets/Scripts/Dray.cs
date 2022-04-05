@@ -12,11 +12,27 @@ public class Dray : MonoBehaviour, IFacingMover, IKeyMaster
     public float AttackDelay = 0.5f;     // Задержка между атаками
     public float TransitionDelay = 0.5f;  // Задержка перехода между комнатами
 
+    public int MaxHealth = 10;
+
     [Header("Set Dynamically")]
     public int DirHeld = -1; // Направление, соответсвующее удерживаемой клавише
     public int Facing = 1;   // Направление движения Дрея
     public EMode Mode = EMode.Idle;
     public int NumKeys = 0;
+
+    [SerializeField] private int _health;
+
+    public int Health
+    {
+        get
+        {
+            return _health;
+        }
+        set
+        {
+            _health = value;
+        }
+    }
 
     private float _timeAttackDone = 0;
     private float _timeAttackNext = 0;
@@ -36,6 +52,7 @@ public class Dray : MonoBehaviour, IFacingMover, IKeyMaster
         _rigidbody = GetComponent<Rigidbody>();
         _animator = GetComponent<Animator>();
         _inRoom = GetComponent<InRoom>();
+        Health = MaxHealth;
     }
 
     private void Update()
