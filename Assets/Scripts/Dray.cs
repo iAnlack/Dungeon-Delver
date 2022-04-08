@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Dray : MonoBehaviour, IFacingMover, IKeyMaster
 {
-    public enum EMode { Idle, Move, Attack, Transition }
+    public enum EMode { Idle, Move, Attack, Transition, Knockback }
 
     [Header("Set in Inspector")]
     public float Speed = 5;
@@ -13,12 +13,16 @@ public class Dray : MonoBehaviour, IFacingMover, IKeyMaster
     public float TransitionDelay = 0.5f;  // Задержка перехода между комнатами
 
     public int MaxHealth = 10;
+    public float KnockbackSpeed = 10;
+    public float KnockbackDuration = 0.25f;
+    public float InvincibleDuration = 0.5f;
 
     [Header("Set Dynamically")]
     public int DirHeld = -1; // Направление, соответсвующее удерживаемой клавише
     public int Facing = 1;   // Направление движения Дрея
     public EMode Mode = EMode.Idle;
     public int NumKeys = 0;
+    public bool Invincible = false;
 
     [SerializeField] private int _health;
 
@@ -39,7 +43,11 @@ public class Dray : MonoBehaviour, IFacingMover, IKeyMaster
 
     private float _transitionDone = 0;
     private Vector2 _transitionPos;
+    private float _knockbackDone = 0;
+    private float _invincibleDone = 0;
+    private Vector3 _knockbackVel;
 
+    private SpriteRenderer _sRend;
     private Rigidbody _rigidbody;
     private Animator _animator;
     private InRoom _inRoom;
@@ -49,6 +57,7 @@ public class Dray : MonoBehaviour, IFacingMover, IKeyMaster
 
     private void Awake()
     {
+        _sRend = GetComponent<SpriteRenderer>();
         _rigidbody = GetComponent<Rigidbody>();
         _animator = GetComponent<Animator>();
         _inRoom = GetComponent<InRoom>();
@@ -57,6 +66,21 @@ public class Dray : MonoBehaviour, IFacingMover, IKeyMaster
 
     private void Update()
     {
+        // Проверить состояние неуязвимости и необходимость выполнить отбрасывание
+        if (Invincible && Time.time > _invincibleDone)
+        {
+            Invincible = false;
+        }
+        _sRend.color = Invincible ? Color.red : Color.white;
+        if (Mode == EMode.Knockback)
+        {
+            _rigidbody.velocity = _knockbackVel;
+            if (Time.time < _knockbackDone)
+            {
+                return;
+            }
+        }
+
         if (Mode == EMode.Transition)
         {
             _rigidbody.velocity = Vector3.zero;
@@ -180,6 +204,49 @@ public class Dray : MonoBehaviour, IFacingMover, IKeyMaster
                 Mode = EMode.Transition;
                 _transitionDone = Time.time + TransitionDelay;
             }
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (Invincible)
+        {
+            return; // Выйти, если Дрей пока неуязвим
+        }
+        DamageEffect damageEffect = collision.gameObject.GetComponent<DamageEffect>();
+        if (damageEffect == null)
+        {
+            return; // Если компонент DamageEffect отсутсвует -выйти
+        }
+
+        Health -= damageEffect.Damage; // Вычесть величину ущерба из уровня здоровья
+        Invincible = true; // Сделать Дрея неуязвимым
+        _invincibleDone = Time.time + InvincibleDuration;
+
+        if (damageEffect.Knockback) // Выполнить отбрасывание
+        {
+            // Определить направление отбрасывания
+            Vector3 delta = transform.position - collision.transform.position;
+            if (Mathf.Abs(delta.x) >= Mathf.Abs(delta.y))
+            {
+                // Отбрасывание по горизонтали
+                delta.x = (delta.x > 0) ? 1 : -1;
+                delta.y = 0;
+            }
+            else
+            {
+                // Отбрасывание по вертикали
+                delta.x = 0;
+                delta.y = (delta.y > 0) ? 1 : -1;
+            }
+
+            // Применить скорость отскока к компоненту Rigidbody
+            _knockbackVel = delta * KnockbackSpeed;
+            _rigidbody.velocity = _knockbackVel;
+
+            // Установить режим Knockback и время прекращения отбрасывания
+            Mode = EMode.Knockback;
+            _knockbackDone = Time.time + KnockbackDuration;
         }
     }
 
