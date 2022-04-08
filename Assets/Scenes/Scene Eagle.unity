@@ -269,6 +269,7 @@ GameObject:
   - component: {fileID: 560529913}
   - component: {fileID: 560529914}
   - component: {fileID: 560529915}
+  - component: {fileID: 560529916}
   m_Layer: 0
   m_Name: Skeletos
   m_TagString: Untagged
@@ -401,8 +402,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fc6c8257fddaf643b198008849fc11e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxHealth: 1
+  MaxHealth: 4
+  KnockbackSpeed: 10
+  KnockbackDuration: 0.25
+  InvincibleDuration: 0.5
   Health: 0
+  Invincible: 0
+  Knockback: 0
   Speed: 2
   TimeThinkMin: 1
   TimeThinkMax: 4
@@ -434,6 +440,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c54973a68bcf2b34a930bd9cf3e243d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &560529916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 560529907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4e6333d45bee5047a9288e80e873f87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Damage: 1
+  Knockback: 1
 --- !u!1 &821943493
 GameObject:
   m_ObjectHideFlags: 0
@@ -445,6 +465,7 @@ GameObject:
   - component: {fileID: 821943494}
   - component: {fileID: 821943495}
   - component: {fileID: 821943496}
+  - component: {fileID: 821943497}
   m_Layer: 0
   m_Name: Sword
   m_TagString: Untagged
@@ -530,6 +551,20 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 0.4375, z: 0.2}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &821943497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 821943493}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4e6333d45bee5047a9288e80e873f87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Damage: 2
+  Knockback: 1
 --- !u!1 &844673430
 GameObject:
   m_ObjectHideFlags: 0
@@ -672,10 +707,14 @@ MonoBehaviour:
   AttackDelay: 0.5
   TransitionDelay: 0.5
   MaxHealth: 10
+  KnockbackSpeed: 10
+  KnockbackDuration: 0.25
+  InvincibleDuration: 0.5
   DirHeld: -1
   Facing: 1
   Mode: 0
   NumKeys: 0
+  Invincible: 0
   _health: 0
 --- !u!135 &844673436
 SphereCollider:

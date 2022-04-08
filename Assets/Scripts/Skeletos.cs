@@ -21,8 +21,14 @@ public class Skeletos : Enemy, IFacingMover
         _inRoom = GetComponent<InRoom>();
     }
 
-    private void Update()
+    override protected void Update()
     {
+        base.Update();
+        if (Knockback)
+        {
+            return;
+        }
+
         if (Time.time >= TimeNextDecision)
         {
             DecideDirection();
