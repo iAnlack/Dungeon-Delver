@@ -250,6 +250,28 @@ public class Dray : MonoBehaviour, IFacingMover, IKeyMaster
         }
     }
 
+    private void OnTriggerEnter(Collider collider)
+    {
+        PickUp pickUp = collider.GetComponent<PickUp>();
+        if (pickUp == null)
+        {
+            return;
+        }
+
+        switch (pickUp.ItemType)
+        {
+            case PickUp.EType.Key:
+                KeyCount++;
+                break;
+
+            case PickUp.EType.Health:
+                Health = Mathf.Min(Health + 2, MaxHealth);
+                break;
+        }
+
+        Destroy(collider.gameObject);
+    }
+
     // Реализация интерфейса IFacingMover
     public int GetFacing()
     {

@@ -12,6 +12,8 @@ public class Enemy : MonoBehaviour
     public float KnockbackSpeed = 10;
     public float KnockbackDuration = 0.25f;
     public float InvincibleDuration = 0.5f;
+    public GameObject[] RandomItemDrops;
+    public GameObject GuaranteedItemDrop = null;
 
     [Header("Set Dynamycally: Enemy")]
     public float Health;
@@ -105,6 +107,23 @@ public class Enemy : MonoBehaviour
 
     private void Die()
     {
+        GameObject go;
+        if (GuaranteedItemDrop != null)
+        {
+            go = Instantiate<GameObject>(GuaranteedItemDrop);
+            go.transform.position = transform.position;
+        }
+        else if (RandomItemDrops.Length > 0)
+        {
+            int n = Random.Range(0, RandomItemDrops.Length);
+            GameObject prefab = RandomItemDrops[n];
+            if (prefab != null)
+            {
+                go = Instantiate<GameObject>(prefab);
+                go.transform.position = transform.position;
+            }
+        }
+
         Destroy(gameObject);
     }
 }
