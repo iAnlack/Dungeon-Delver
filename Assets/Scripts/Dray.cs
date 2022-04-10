@@ -23,6 +23,9 @@ public class Dray : MonoBehaviour, IFacingMover, IKeyMaster
     public EMode Mode = EMode.Idle;
     public int NumKeys = 0;
     public bool Invincible = false;
+    public bool HasGrappler = false;
+    public Vector3 LastSafeLoc;
+    public int LastSafeFacing;
 
     [SerializeField] private int _health;
 
@@ -62,6 +65,8 @@ public class Dray : MonoBehaviour, IFacingMover, IKeyMaster
         _animator = GetComponent<Animator>();
         _inRoom = GetComponent<InRoom>();
         Health = MaxHealth;
+        LastSafeLoc = transform.position; // Начальная позиция безопасна
+        LastSafeFacing = Facing;
     }
 
     private void Update()
@@ -201,6 +206,8 @@ public class Dray : MonoBehaviour, IFacingMover, IKeyMaster
                 RoomNum = rm;
                 _transitionPos = InRoom.DOORS[(doorNum + 2) % 4];
                 RoomPos = _transitionPos;
+                LastSafeLoc = transform.position;
+                LastSafeFacing = Facing;
                 Mode = EMode.Transition;
                 _transitionDone = Time.time + TransitionDelay;
             }
@@ -267,9 +274,23 @@ public class Dray : MonoBehaviour, IFacingMover, IKeyMaster
             case PickUp.EType.Health:
                 Health = Mathf.Min(Health + 2, MaxHealth);
                 break;
+
+            case PickUp.EType.Grappler:
+                HasGrappler = true;
+                break;
         }
 
         Destroy(collider.gameObject);
+    }
+
+    public void ResetInRoom(int healthLoss = 0)
+    {
+        transform.position = LastSafeLoc;
+        Facing = LastSafeFacing;
+        Health -= healthLoss;
+
+        Invincible = true; // Сделать Дрея неуязвимым
+        _invincibleDone = Time.time + InvincibleDuration;
     }
 
     // Реализация интерфейса IFacingMover
