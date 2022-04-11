@@ -273,7 +273,7 @@ MonoBehaviour:
     OverrideTileNum: -1
   - TileNum: 232
     SwapPrefab: {fileID: 6442618678645988729, guid: 2af24a00cea44894492ec439567c5bdd, type: 3}
-    GuaranteedItemDrop: {fileID: 0}
+    GuaranteedItemDrop: {fileID: 6853836995239064763, guid: 3c5fbf06ce1d2c6499e8682d1faa2bea, type: 3}
     OverrideTileNum: -1
   - TileNum: 193
     SwapPrefab: {fileID: 1000011084335560, guid: c0a773a79706a44f19d02f6f29101480, type: 3}
