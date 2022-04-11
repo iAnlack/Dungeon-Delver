@@ -2,7 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
+public class TileSwap
+{
+    public int TileNum;
+    public GameObject SwapPrefab;
+    public GameObject GuaranteedItemDrop;
+    public int OverrideTileNum = -1;
+}
+
 public class TileCamera : MonoBehaviour
+
 {
     static private int      W, H;
     static private int[,]   MAP;
@@ -16,10 +26,18 @@ public class TileCamera : MonoBehaviour
     public Texture2D MapTiles;
     public TextAsset MapCollisions;   // ...
     public Tile      TilePrefab;
+    public int DefaultTileNum;
+    public List<TileSwap> TileSwaps;
+
+    private Dictionary<int, TileSwap> _tileSwapDict;
+    private Transform _enemyAnchor, _itemAnchor;
 
     private void Awake()
     {
         COLLISIONS = Utils.RemoveLineEndings(MapCollisions.text);
+        PrepareTileSwapDict();
+        _enemyAnchor = (new GameObject("Enemy Anchor")).transform;
+        _itemAnchor = (new GameObject("Item Anchor")).transform;
         LoadMap();
     }
 
@@ -55,6 +73,7 @@ public class TileCamera : MonoBehaviour
                 {
                     MAP[i, j] = int.Parse(tileNums[i], hexNum);
                 }
+                CheckTileSwaps(i, j);
             }
         }
 
@@ -69,23 +88,74 @@ public class TileCamera : MonoBehaviour
     /// </summary>
     private void ShowMap()
         {
-        TILES = new Tile[W, H];
+            TILES = new Tile[W, H];
 
-        // Просмотреть всю карту и создать плитки, где необходимо
-        for (int j = 0; j < H; j++)
-        {
-            for (int i = 0; i < W; i++)
+            // Просмотреть всю карту и создать плитки, где необходимо
+            for (int j = 0; j < H; j++)
             {
-                if (MAP[i,j] != 0)
+                for (int i = 0; i < W; i++)
                 {
-                    Tile tile = Instantiate<Tile>(TilePrefab);
-                    tile.transform.SetParent(TILE_ANCHOR);
-                    tile.SetTile(i, j);
-                    TILES[i, j] = tile;
+                    if (MAP[i,j] != 0)
+                    {
+                        Tile tile = Instantiate<Tile>(TilePrefab);
+                        tile.transform.SetParent(TILE_ANCHOR);
+                        tile.SetTile(i, j);
+                        TILES[i, j] = tile;
+                    }
                 }
             }
         }
+
+    private void PrepareTileSwapDict()
+    {
+        _tileSwapDict = new Dictionary<int, TileSwap>();
+        foreach(TileSwap ts in TileSwaps)
+        {
+            _tileSwapDict.Add(ts.TileNum, ts);
         }
+    }
+
+    private void CheckTileSwaps(int i, int j)
+    {
+        int tNum = GET_MAP(i, j);
+        if (!_tileSwapDict.ContainsKey(tNum))
+        {
+            return;
+        }
+        // Мы должны заменить плитку
+        TileSwap ts = _tileSwapDict[tNum];
+        if (ts.SwapPrefab != null)
+        {
+            GameObject go = Instantiate(ts.SwapPrefab);
+            Enemy e = go.GetComponent<Enemy>();
+            if (e != null)
+            {
+                go.transform.SetParent(_enemyAnchor);
+            }
+            else
+            {
+                go.transform.SetParent(_itemAnchor);
+            }
+            go.transform.position = new Vector3(i, j, 0);
+            if (ts.GuaranteedItemDrop != null)
+            {
+                if (e != null)
+                {
+                    e.GuaranteedItemDrop = ts.GuaranteedItemDrop;
+                }
+            }
+        }
+
+        // Заменить другой плиткой
+        if (ts.OverrideTileNum == -1)
+        {
+            SET_MAP(i, j, DefaultTileNum);
+        }
+        else
+        {
+            SET_MAP(i, j, ts.OverrideTileNum);
+        }
+    }
 
     static public int GET_MAP(int x, int y)
     {
